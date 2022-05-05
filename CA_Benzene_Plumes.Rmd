@@ -1,0 +1,704 @@
+---
+# Choose from this list of Journals:
+# JGR: Atmospheres, JGR: Biogeosciences, JGR: Earth Surface, 
+# JGR: Oceans, JGR: Planets, JGR: Solid Earth, JGR: Space Physics, 
+journal: "Geohealth"
+classoption: "draft,linenumbers"
+title: "Geographic Characterization of Benzene Plumes in California"
+authors:
+  - name: Andrew R. Murray
+    affil: "1, 2"
+    thanks: Andrew's thanks
+  - name: Diego Riveros-Iregui
+    affil: 1
+    thanks: "Current address: Some other place, Germany"
+  - name: Alexander Hall
+    affil: 3
+  - name: Fran Kremer
+    affil: 3
+affiliations:
+  - number: 1
+    name: "The University of North Carolina - Chapel Hill"
+  - number: 2
+    name: "Oak Ridge Associated Universities"
+  - number: 3
+    name: "U.S. Environmental Protection Agency Office of Research and Development"
+corresponding_author:
+  - name: Andrew Murray
+    email: Murray.AndrewR@epa.gov
+keypoints:  
+  - "Spatio-temporal patterns of benzene plumes are still poorly understood."
+  - "Most plumes are not spatially captured by groundwater testing."
+  - "Better models are needed to inform monitoring well selection for leaking sites."
+abstract: "Underground storage tanks are tanks buried underground for the purpose of storing and dispensing a wide range of hazardous products. The primary use for these tanks are the storing and dispensing of fuel products such as gasoline and diesel. In the United States there are currently 540,000 open (in operation) tanks. Since 2000, there have been more than 118,000 reported releases. When fuel products release into the ground or onto the surface they can contaminate local soil and groundwater resources, as well as pollute the air by means of vapor intrusion. Petroleum hydrocarbons, which are known carcinogens, pose a threat to human and environmental health. They can persist in the environment for decades, and can contaminate drinking water to unsafe levels before becoming detectable by smell or taste. Benzene is the most common petroleum hydrocarbon found in fuel products and several studies have been conducted on it's potential for movement in the environment, however these studies all generally contain a limited number of sites within a limited geographic area and much remains to be understood related to environmental drivers."
+plain_language_summary: ""
+output: 
+    rticles::agu_article
+bibliography: references.bib
+header-includes: 
+      - \usepackage{soulutf8}  # For UTF8 chars in TrackChanges
+      - \usepackage{float}
+      - \floatplacement{figure}{H}
+# which is available from this link:
+# https://publications.agu.org/files/2019/02/January-14-2019-latex-templates.zip
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
+# Some recommended settings. 
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.pos = 'h',
+  out.extra = "",   # To force the use of figure enviroment
+  fig.cap = "Please caption every figure"
+)
+
+library(tidyverse)
+library(sf)
+library(vroom)
+library(here)
+library(gt)
+library(cowplot)
+require('coin')
+
+# Load analysis data
+td <- vroom(here("Data_Preparation/Analysis_Data/Benzene_Time_Dist.tsv"))
+plumeAreas <- st_read(here("Data_Preparation/Analysis_Data/rotated_Polygons.gpkg"),layer = "Plumes")
+monitorAreas <- st_read(here("Data_Preparation/Analysis_Data/rotated_Polygons.gpkg"),layer = "Study_Area")%>%
+  st_cast("MULTILINESTRING")
+boundaryPts <- st_read(here("Data_Preparation/Analysis_Data/rotated_Polygons.gpkg"),
+         layer = "Roints")%>%
+  filter(PARVAL >=5)
+# boundaryPts2 <- st_read(here("CA_Benzene_Plumes/Data_Preparation/Analysis_Data/rotated_Polygons.gpkg"),
+#          layer = "SA_Boundary_Points")%>%
+#   filter(PARVAL >=5)
+
+pts <- st_read("D:/Github/UST_Groundwater_Vulnerability_Model/projects/PetroleumHydrocarbons/data/meanDirection/rotated_Polygons.gpkg",
+         layer = "Points")
+```
+
+```{r keypoints_check, echo=FALSE, results='asis', eval = TRUE}
+# This chunk adds a warning if any keypoint is longer than 100 characters. 
+# To disable it, you can remove it or set eval to FALSE.
+if (any(nchar(rmarkdown::metadata$keypoints) > 100)) {
+  cat("\\textcolor{red}{\\textbf{Warning}: keypoint(s)", 
+      knitr::combine_words(which(nchar(rmarkdown::metadata$keypoints) > 100)), 
+      "longer than 100 characters.}")
+}
+```
+
+# Introduction
+
+Benzene, a carcinogenic component of petroleum products such as gasoline
+is known to be released into the environment as the result of leaking
+underground storage tanks (LUST). There are currently about 540,000
+active petroleum UST systems and a backlog of 62,000 LUST sites in the
+United States \citep{ustperformance} . The definition of a leaking
+underground storage tank can vary depending on which state or federal
+regulations you consider. The federal government considers reportable
+quantities of petroleum products to be anything over 25 gallons, or a
+spill that cannot be cleaned up within 24 hours \citep{coderegs}.
+Many studies have been done on benzene plume length and attenuation 
+\citep[e.g.,][]{connor2015, kamath2012, shih2004evaluation}. However much is still unknown about the behavior and extent of benzene plumes. For example, while most papers focus on distance (one-dimensional), fewer characterize total impacted area
+(two-dimensional), and those that do, typically focus on only a relative
+few contaminated sites. A review paper on studies on benzene plume
+length showed that research on this area included between 22 to 289 LUST
+sites per study \citep{connor2015}. \citet{mchugh2014progress} included over
+4,000 LUST sites, however this was not focused on distance or area but
+rather trends in concentration over time. A key reason
+for the limited number of sites included in these studies is data
+availability. Although states are required to test and characterize
+sites contaminated or suspected to be contaminated by leaking
+underground storage tanks, very limited amounts of these data are made
+public. In most of the papers cited here, authors accumulated limited
+amounts of field data from multiple agencies and sources. An exception
+to this is California's geotracker database, the largest publicly
+available database of its kind, which includes field data for leaking
+underground storage tank cleanup sites dating back to 2000.
+
+There has yet to be a study done on benzene plume areas that
+sufficiently considers a large number of field studies, geographic
+diversity of sites, and two-dimensional plume shape. Further, no study
+has been able to offer insight into estimating plume locations, which
+could help to make future testing campaigns more efficient and accurate.
+In this paper, we aim to consider the largest number of field studies to
+date and to characterize benzene plume shapes and distances. To do this,
+we use data obtained from California's GeoTracker database and compare geotracker data with the findings of \citet{connor2015} to determine how a larger and more diverse
+sample size supports or disagrees with the findings of other studies. We
+then characterize two-dimensional benzene plume areas to determine the shape and distribution of benzene plumes. Finally, we determine how effective monitoring wells are at completely capturing benzene plumes in California. These essential investigations will help to determine if we can more accurately estimate plume extents in the future and
+suggest possible ways to make LUST site investigations and monitoring campaigns more efficient. California's
+geotracker database is a valuable and generally untapped resource of
+information which should be a model for other state agencies which are
+responsible for the cleanup of LUST sites.
+
+# Materials and Methods
+
+## California release definitions
+
+The definition of a release varies from state to state, however all states must report releases that meet or exceed the criteria of the federal reporting requirements. Many releases do not meet this threshold but may still appear in California's geotracker database.
+California defines a release as:
+
+>"[A] spill or overfill of a hazardous substance that meets both of the following
+>conditions: (1) The spill or overfill occurs while the hazardous
+>substance is being placed in an underground storage tank. (2) The spill
+>or overfill is due to the use of improper equipment, faulty equipment,
+>operator error, or inattention or overfilling \citep{careport25295.5}"
+
+
+In California, operators are not required to report a release or spill if they are "able to clean up within eight hours
+after the release was detected or should reasonably have been detected,
+and which does not escape from the secondary containment, does not
+increase the hazard of fire or explosion, and does not cause any
+deterioration of the secondary containment of the underground storage
+tank." However the operator must record the incident in monitoring reports \citep{careport25294}. If these thresholds are exceeded, the operator must report the spill to the apropriate state agency \citep{careport25295}.
+
+
+## Geotracker
+
+The data obtained from GeoTracker contains groundwater measurements from
+`r length(unique(td$GLOBAL_ID))` unique leaking underground storage
+sites. Previous Studies have proposed that the maximum travel distance of
+benzene in the ground is between 300 and 1,700 feet and that the 90th
+percentile of benzene plume lengths is between 345 and 425 feet \citep{connor2015}.
+There are more than 500,000 underground storage tanks in the United
+States. For about every 7 active tanks, one will report a release in
+it's lifetime \citep{ustperformance}. Several studies exist which examine the distances and
+depths of benzene migration in the vadose zone, however most studies
+lack robust numbers of study sites as cleanup data is not widely
+available. Further, no studies exist which examine the two-dimensional
+footprints of benzene plumes at large scales or monitoring well
+placement relative to leak points. We examine over three-thousand
+leaking underground storage tank (LUST) site cleanups in California
+which exhibited measurable benzene plumes and determine characteristics
+of their spatial extents, flow directions and whether the monitoring
+wells used at the sites adequately capture plume extents. We determine (a) if geotracker data supports previous studies in 1-dimensional maximum plume distance. (b) from a spatial perspective, if site monitoring efforts are effectively capturing 2-dimensional benzene plumes, (c) if benzene plumes have a pronounced shape to them and the size of impacted areas, and (d) discuss what can be done to make plume monitoring more effective and efficient in the future.
+
+## Determining Plume Length
+
+There is no set definition for the point of origin for an underground
+storage tank release. This is common as most releases are discovered as
+a result of tank removal and it is often unclear from exactly where a
+release occurred. While the geotracker database does provide xy locations for both 'UST / UST pit' and 'former UST' locations, these data only exist at less than 200 of LUST cleanup sites. Therefore, we define the point of release as the point
+where benzene concentration was the highest at a given site. If there
+were multiple measurements of the maximum concentration at different
+points, the earliest measurement was used. As in \citet{connor2015}, the
+plume is defined as the total area above two separate thresholds, 5 ug/L
+and 10 ug/L to match with definitions used by previous studies. To be clear, the current federal MCL for benzene is 5 ug/L.
+
+## Evaluating Capture of Plumes by Monitoring Wells
+
+We look at plume extents compared to monitoring extents to determine if plumes are
+completely captured by monitoring wells or if concentrations greater
+than 5 ug/L are possibly extending beyond monitoring wells. To test
+this, we create convex hulls \citep{sf} of the monitoring wells which measured $\ge 5 ug/L$
+ for every testing event for every site and also convex hulls for monitoring wells for every site. We define samples taken in a specific testing event as a time when the origination point was tested, and every sample taken from every well within &plusmn; 28 days.
+
+```{r exceedsExample, message = FALSE, warning=FALSE, fig.cap="Example of Plumes that are completely captured by monitoring wells (A) and plumes which likely travel beyond he extent of moniotring wells (B)."}
+plume1 <- td%>%
+  filter(GLOBAL_ID == "T0600100108" & PARVAL >=5)%>%
+  st_as_sf(coords = c("LONGITUDE","LATITUDE"), crs = 4326)%>%
+  st_union()%>%
+  st_convex_hull()
+
+sa1 <- td%>%
+  filter(GLOBAL_ID == "T0600100108")%>%
+  st_as_sf(coords = c("LONGITUDE","LATITUDE"), crs = 4326)%>%
+  st_union()%>%
+  st_convex_hull()
+
+exceed <- ggplot()+
+  geom_sf(data = sa1, color = "#1b9e77", size = 3)+
+  geom_sf(data = plume1, color = "#d95f02", size = 2)+
+  labs(title = "Example of Boundary Exceedance")+
+  theme(
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank())
+
+plume2 <- td%>%
+  filter(GLOBAL_ID == "T0600100111" & PARVAL >=5)%>%
+  st_as_sf(coords = c("LONGITUDE","LATITUDE"), crs = 4326)%>%
+  st_union()%>%
+  st_convex_hull()
+
+sa2 <- td%>%
+  filter(GLOBAL_ID == "T0600100111")%>%
+  st_as_sf(coords = c("LONGITUDE","LATITUDE"), crs = 4326)%>%
+  st_union()%>%
+  st_convex_hull()
+
+contain <- ggplot()+
+  geom_sf(data = sa2, color = "#1b9e77", size = 3)+
+  geom_sf(data = plume2, color = "#d95f02", size = 2)+
+  labs(title = "Example of Plume Capture")+
+  theme(
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank())
+
+plot_grid(contain,exceed, align = "h",
+          labels = c("A","B"),
+          label_x = .1,
+          label_y = .9)
+```
+
+## Normalizing Plume Direction
+
+We map out the distribution of monitoring wells relative to the mean
+linear direction of a benzene plume. To determine the mean linear
+direction of benzene movement through the ground, we use weighted vector addition to
+determine the mean angle of flow in degrees from north. We then
+artificially rotate the plumes so that they are normalized to one
+direction (due north) and overlay them to map out monitoring wells relative
+to the leak point and direction of flow and regardless to actual location. All analysis was done in using the R statistical language \citep{R} within RStudio \citep{RStudio}. Coordinate math was done using sf \citep{sf} and bearing directions were calculated using stplanr \citep{stplanr}. Data cleaning relied on the tidyverse package \citep{tidyverse}. To weight monitoring wells, benzene concentrations were multiplied by the distance in meters of the monitoring well from the LOP. Lines were then created using existing bearings for each monitoring well from the LOP and lengths from weighted distances. Lines were then drawn end to end and the mean linear direction was calculated as the bearing between the LOP and the end vertex of the final weighted line.
+
+```{r fig1, out.width=400, fig.cap="Illustration of mean direction calculation. Panel A shows actual locations and concentrations of benzene relative to LOP. Panel B shows weighted vector math result with mean linear direction calculation."}
+knitr::include_graphics("img/meanDirection.png")
+```
+
+
+
+We included all benzene samples in geotracker which were taken at LUST
+cleanup sites and were analyzed as either ug/L or mg/L (91.3% of all
+samples). In total, we included 1.8 million benzene samples from 104,254
+geographically unique sampling points at 8,409 LUST cleanup sites. 7,058
+LUST cleanup sites had benzene concentrations greater than the MCL (5
+ug/L).
+
+
+# Results
+
+## Maximum Plume Distance
+
+Figure 2 shows the maximum distance benzene was measured from the point of origination.
+
+```{r maxDist, message = FALSE, warning=FALSE, fig.height=6, fig.width=5.5, fig.cap="Maximum calculated distance of benzene plumes in meters using a threshold of 10 ug/L."}
+maxDist10 <- td%>%
+  filter(PARVAL >= 10)%>%
+  group_by(GLOBAL_ID)%>%
+  mutate(maxDist = max(Distance_m))%>%
+  ungroup()%>%
+  select(GLOBAL_ID, maxDist)%>%
+  distinct()%>%
+  mutate(maxDist = if_else(maxDist > 600,600, maxDist))
+
+max10Plot <- ggplot(maxDist10)+
+  geom_histogram(aes(x = maxDist),binwidth = 10)+
+  xlim(0,640)+
+  ylim(0,900)+
+  geom_segment(x=91.44 ,y =0, xend=91.44, yend =800)+
+  annotate("text", x = 200, y = 780, label = "Reisinger et al. (2000)")+
+  geom_segment(x=137 ,y =0, xend=137, yend =700 )+
+  annotate("text", x = 240, y = 680, label = "Mace & Choi (1998)")+
+  geom_segment(x=524 ,y =0, xend=524, yend =600 )+
+  annotate("text", x = 435, y = 570, label = "Rice et al. (1995)")+
+  labs(title = "Maximum Distance of Benzene > 10 ug/L",
+       caption = paste0("N = ", nrow(maxDist10)," / Binwidth = 10m"),
+       x = "Meters",y = "Count of Sites")+
+  scale_x_continuous(breaks=c(0,200,400,600),
+        labels=c("0", "200", "400","> 600"))
+
+# 5 ug/L
+maxDist5 <- td%>%
+  filter(PARVAL >= 5)%>%
+  group_by(GLOBAL_ID)%>%
+  mutate(maxDist = max(Distance_m))%>%
+  ungroup()%>%
+  select(GLOBAL_ID, maxDist)%>%
+  distinct()%>%
+  mutate(maxDist = if_else(maxDist > 600,600, maxDist))
+
+max5Plot <- ggplot(maxDist5)+
+  geom_histogram(aes(x = maxDist),binwidth = 10)+
+  xlim(0,640)+
+  ylim(0,900)+
+  geom_segment(x=168 ,y =0, xend=168, yend =700 )+
+  annotate("text", x = 250, y = 680, label = "Shi et al. (2004)")+
+  geom_segment(x=305 ,y =0, xend=305, yend =600)+
+  annotate("text", x = 405, y = 580, label = "Riffai & Rixey (2004)")+
+  geom_segment(x=502 ,y =0, xend=502, yend =450 )+
+  annotate("text", x = 435, y = 380, label = str_wrap("Kamath et al. (2012)",13))+
+  labs(title = "Maximum Distance of Benzene > 5 ug/L",
+       caption = paste0("N = ", nrow(maxDist5)," / Binwidth = 10m"),
+       x = "Meters",y = "Count of Sites")+
+  scale_x_continuous(breaks=c(0,200,400,600),
+        labels=c("0", "200", "400","> 600"))
+
+plot_grid(max10Plot,max5Plot, align = "v",
+          nrow = 2,
+          labels = c("A","B"),
+          label_x = .1,
+          label_y = .9)
+
+
+
+
+# Script Plume_Area_Analysis.R
+
+## Import data
+areas <- vroom("D:/Github/UST_Groundwater_Vulnerability_Model/projects/PetroleumHydrocarbons/data/Plume_Area_Analysis.csv")
+
+## Join max distance and median PARVAL
+medPARVAL <- td%>%
+  filter(PARVAL > 0)%>%
+  group_by(GLOBAL_ID)%>%
+  mutate(medPARVAL = median(PARVAL))%>%
+  ungroup()%>%
+  select(GLOBAL_ID,medPARVAL)%>%
+  distinct()
+
+exceedanceDf <- areas%>%
+  left_join(maxDist5)%>%
+  left_join(medPARVAL)
+```
+
+```{r boundaryExceedance, message = FALSE, warning=FALSE,fig.cap="Exceedance classification for every LUST cleanup site in California with more than 3 sampling points > 5 ug/L shown with maximum plume distance and median concentration at site."}
+# Script Plume_Area_Analysis.R
+
+## Import data
+areas <- vroom("D:/Github/UST_Groundwater_Vulnerability_Model/projects/PetroleumHydrocarbons/data/Plume_Area_Analysis.csv")
+
+## Join max distance and median PARVAL
+medPARVAL <- td%>%
+  filter(PARVAL > 0)%>%
+  group_by(GLOBAL_ID)%>%
+  mutate(medPARVAL = median(PARVAL))%>%
+  ungroup()%>%
+  select(GLOBAL_ID,medPARVAL)%>%
+  distinct()
+
+exceedanceDf <- areas%>%
+  left_join(maxDist5)%>%
+  left_join(medPARVAL)
+
+plotAll <- ggplot(exceedanceDf)+
+  geom_point(aes(x = maxDist, y = medPARVAL, color = Plume_At_Boundary), alpha = .5)+
+  scale_color_manual(values = c("#1b9e77","#d95f02"))+
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))+
+  labs(title = "MCL Exceedance Measured at Testing Boundary",
+       x = "Distance from Release [m]",
+       y = "Median Benzene Concentration at Site [ug/L]",
+       color = "MCL Exceeded")
+
+## Zoom in
+exceedanceSub <- exceedanceDf%>%
+  filter(medPARVAL <5000 & maxDist < 200)
+plotSub <- ggplot(exceedanceSub)+
+  geom_point(aes(x = maxDist, y = medPARVAL, color = Plume_At_Boundary),
+             show.legend = FALSE, alpha = .5)+
+  scale_color_manual(values = c("#1b9e77","#d95f02"))+
+  labs(title = "",
+       x = "",
+       y = "",
+       color = "MCL Exceeded")+
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))+
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=2))
+
+plotAll + annotation_custom(ggplotGrob(plotSub), xmin = 200, xmax = 600, 
+                       ymin = 10000, ymax = 28000)
+```
+
+
+
+2,597 of 3,300 cleanup sites had an exceedance of 5 ug/L at the testing
+boundary (78.7%)
+
+## Overlayed Plumes and Study Areas
+
+-   We found 4,202 plumes with at least 3 points with benzene
+    concentrations \>= 5 ug/L. We calculated mean linear direction of
+    benzene flow and rotated each plume to due north. Each plume was
+    overlaid by shifting the leak origination point to the coordinates
+    (0,0) in the California albers projection.
+
+All Plumes and Study Areas
+
+```{r AllplumeAreas, message = FALSE, warning=FALSE}
+plumeAreas$type <- st_geometry_type(plumeAreas)
+  
+plumeLines <- plumeAreas%>%
+  filter(type == "POLYGON")%>%
+  st_cast("MULTILINESTRING")
+
+allPlumesPlot <- ggplot(plumeLines)+
+  geom_sf(color = "#d95f02", alpha = .01)+
+  xlim(-200,200)+
+  ylim(-200,200)+
+  coord_sf(datum = st_crs(3310))+
+  geom_segment(x=0,xend=0,y=-100,yend=100,linetype=3)+
+  geom_segment(x=-100,xend=100,y=0,yend=0,linetype=3)+
+  labs(title = "Benzene Plumes Overlaid",
+       caption = paste0("N = ",nrow(plumeAreas)),
+       x = "Meters",y="Meters")
+
+
+
+allMonitorPlot <- ggplot(monitorAreas)+
+  geom_sf(color = "#1b9e77", alpha = .01)+
+  xlim(-200,200)+
+  ylim(-200,200)+
+  coord_sf(datum = st_crs(3310))+
+  geom_segment(x=0,xend=0,y=-100,yend=100,linetype=3)+
+  geom_segment(x=-100,xend=100,y=0,yend=0,linetype=3)+
+  labs(title = "Benzene Monitoring Areas Overlaid",
+       caption = paste0("N = ",nrow(plumeAreas)),
+       x = "Meters",y="Meters")
+
+gridExtra::grid.arrange(allPlumesPlot,allMonitorPlot, nrow = 1)
+```
+
+## Plumes entirely within testing boundary
+
+```{r plumesinBoundary, message = FALSE, warning=FALSE}
+plumeCapture <- exceedanceDf%>%
+  filter(Plume_At_Boundary == "FALSE")
+
+plumeLinesFilt <- plumeLines%>%
+  filter(GLOBAL_ID %in% plumeCapture$GLOBAL_ID)
+
+ggplot(plumeLinesFilt)+
+  geom_sf(color = "#d95f02", alpha = .1)+
+  xlim(-200,200)+
+  ylim(-200,200)+
+  coord_sf(datum = st_crs(3310))+
+  geom_segment(x=0,xend=0,y=-100,yend=100,linetype=3)+
+  geom_segment(x=-100,xend=100,y=0,yend=0,linetype=3)+
+  labs(title = "Benzene Plumes Overlaid",
+       caption = paste0("N = ",nrow(plumeLinesFilt)),
+       x = "Meters",y="Meters")
+
+
+```
+
+
+
+## Are plumes that are completely captured, significantly smaller than plumes that have boundary exceedance?
+
+```{r plumeAreaCompare, message = FALSE, warning=FALSE}
+areaCompare <- plumeAreas%>%
+  left_join(exceedanceDf)%>%
+  drop_na(Plume_At_Boundary)
+areaCompare$Area <- st_area(areaCompare)
+
+ggplot(areaCompare)+
+  geom_boxplot(aes(x = Plume_At_Boundary, y = as.numeric(Area), fill = Plume_At_Boundary))+
+  scale_fill_manual(values = c("#1b9e77","#d95f02"))+
+  coord_cartesian(ylim=c(0, 1500))+
+  labs(x = "Plume at Boundary", y = "Plume Area [m^2]",
+       fill = "Plume at Boundary")
+```
+
+This plot tells us that when plumes are completely captured (spatially)
+that they are not larger than if plumes extend to the boundary of a
+monitoring network. This suggests that plumes, in general, are larger
+than the data suggests. Measured plumes get larger as monitored areas
+get larger.
+
+## Wilcox Test
+
+```{r wilcox, message = FALSE, warning=FALSE}
+wx <- exceedanceDf%>%
+      rstatix::wilcox_test(Plume_Area ~ Plume_At_Boundary, p.adjust.method = "bonferroni")%>%
+      as.data.frame()
+
+pw.effect <- exceedanceDf%>%
+      rstatix::wilcox_effsize(Plume_Area ~ Plume_At_Boundary)%>%
+      as.data.frame()%>%
+      select(effsize,magnitude)
+```
+
+Wilcox Results:
+
+`r gt::gt(wx)`
+
+Effect Size:
+
+`r gt::gt(pw.effect)`
+
+# Conclusions
+
+-   Plumes are not being effectively captured by monitoring wells
+
+    -   When plumes are completely captured by monitoring wells, the
+        plumes tend to be smaller, suggesting that larger plumes are not
+        being reflected in the data and that, in general, monitoring
+        wells are placed at fixed distances.
+
+    -   As Plumes get larger, they are less likely to be captured by
+        monitoring wells
+
+-   There is no clear issue with the radial coverage from a leaking
+    point
+
+    -   The data does not support the hypothesis that monitoring wells
+        are not placed in directions other than the dominant flow
+        direction of benzene.
+
+-   Benzene plumes appear to exhibit radial characteristics with a
+    skewed dominant flow direction.
+
+
+
+# NOTES
+```{r}
+cd <- vroom(here("CA_Benzene_Plumes/Misc_Analysis/LUST_Count_by_Dist_new.csv"))
+cd2 <- vroom(here("CA_Benzene_Plumes/Misc_Analysis/LUST_Count_by_Dist.csv"))
+ggplot(cd)+
+  geom_ribbon(aes(x = Distance_m,ymin=countWells,ymax=1.4*(countWells)), fill="blue", alpha=0.5)+
+  geom_line(aes(x = Distance_m, y = countWells))+
+  geom_line(aes(x = Distance_m, y = 1.4*(countWells)))+
+  geom_segment(x=168 ,y =0, xend=168, yend =1487, color = "#d93f3d")+
+  geom_segment(x=0 ,y =1487, xend=168, yend =1487, color = "#d93f3d")+
+  annotate("text", x = 70, y = 2000, label = "Shi et al. (2004)")+
+  geom_segment(x=305 ,y =0, xend=305, yend =3203, color = "#d93f3d")+
+  geom_segment(x=0 ,y =3203, xend=305, yend =3203, color = "#d93f3d")+
+  annotate("text", x = 150, y = 3700, label = "Riffai & Rixey (2004)")+
+  geom_segment(x=502 ,y =0, xend=502, yend =6682, color = "#d93f3d")+
+  geom_segment(x=0 ,y =6682, xend=502, yend =6682, color = "#d93f3d")+
+  annotate("text", x = 250, y = 7200, label = "Kamath et al. (2012)")+
+  labs(x = "Meters", y = "Number of Domestic Wells",
+       title = "Cumulative Number of Domestic Wells Near LUST Sites")+
+  xlim(0,600)+
+  ylim(0,13000)
+```
+
+
+
+
+```{r}
+ggplot(exceedanceDf)+
+geom_point(aes(x = Plume_Area, y = Tested_Area), alpha = .2)+
+xlim(0,50000)+
+ylim(0,25000)
+```
+
+
+
+Driving Questions:
+
+-   Does our data support the conclusions form other studies on plume
+    length?
+
+-   From a spatial perspective, are site monitoring efforts effectively
+    capturing the complete extent of benzene plumes?
+
+-   What are the shapes of plumes? Are they flowing in a single
+    direction, or are they spreading outwards in many directions?
+
+-   Are there systematic issues in the way that monitoring wells are
+    located? Are we looking in the right places?
+
+-   Can we contribute to better monitoring in the future?
+
+## Plot Points where MCL is exceeded at boundary
+
+In the plot below, we show every point where the mcl was exceeded at a
+testing boundary. If there were a systematic pattern of areas where
+monitoring wells were not being drilled, we would expect to see a more
+concentrated number of points. For example, if technicians were not
+looking far enough away from leak points in the opposite direction of
+the mean linear flow direction of benzene, we would expect to see a
+concentration of points in the area of y \< 0. However, we do not see
+any such pattern. Instead, we see a pattern similar to the general plume
+shape. This indicates that there is no systematic issue with where
+monitoring wells are placed, at least there is no area that is being
+missed more than any other.
+
+```{r boundaryPts, message = FALSE, warning=FALSE}
+# Create point at 0,0
+zero <- data.frame(lat = 0, lng = 0)%>%
+  st_as_sf(coords = c("lng","lat"), crs = 3310)
+
+# Create 10 meter hexagons
+hex <- data.frame(lat = 0, lng = 0)%>%
+  st_as_sf(coords = c("lng","lat"), crs = 3310)%>%
+  st_buffer(250)%>%
+  st_make_grid(cellsize = 15, square = FALSE)%>%
+  st_sf()
+hex$id <- paste0("C",rownames(hex))
+
+# Intersect points and tally
+ptsIntersect <- st_intersection(pts,hex)
+ptsTally <- as.data.frame(table(ptsIntersect$id))
+colnames(ptsTally) <- c("id","Points")
+
+# Intersect boundary points and tally
+boundaryPtsIntersect <- st_intersection(boundaryPts,hex)
+boundaryPtsTally <- as.data.frame(table(boundaryPtsIntersect$id))
+colnames(boundaryPtsTally) <- c("id","BoundaryPoints")
+
+# Join counts back to hexagons
+hexCounts <- hex%>%
+  left_join(ptsTally)%>%
+  left_join(boundaryPtsTally)
+
+
+ggplot(hexCounts)+
+  geom_sf(aes(fill = 100*(BoundaryPoints/Points)))+
+  geom_segment(x=0,xend=0,y=-100,yend=100,linetype=3, color = "white")+
+  geom_segment(x=-100,xend=100,y=0,yend=0,linetype=3, color = "white")+
+  scale_fill_viridis_b(option = "B",na.value="white")+
+  coord_sf(datum = st_crs(3310))+
+  xlim(-150,150)+
+  ylim(-150,150)
+```
+
+
+
+```{=tex}
+\appendix
+\section{Here is a sample appendix}
+```
+Optional Appendix goes here
+
+Optional Glossary, Notation or Acronym section goes here:
+
+Glossary is only allowed in Reviews of Geophysics
+
+```{=tex}
+\begin{glossary}
+\term{Term}
+ Term Definition here
+\term{Term}
+ Term Definition here
+\term{Term}
+ Term Definition here
+\end{glossary}
+```
+```{=tex}
+\begin{acronyms}
+\acro{UST}
+ Underground Storage Tanks
+\acro{LUST}
+ Leaking Underground Storage Tank
+\end{acronyms}
+```
+```{=tex}
+\begin{notation}
+\notation{$a+b$} Notation Definition here
+\notation{$e=mc^2$}
+Equation in German-born physicist Albert Einstein's theory of special
+relativity that showed that the increased relativistic mass ($m$) of a
+body comes from the energy of motion of the body—that is, its kinetic
+energy ($E$)—divided by the speed of light squared ($c^2$).
+\end{notation}
+```
+\acknowledgments
+
+The acknowledgments must list: A statement that indicates to the reader
+where the data supporting the conclusions can be obtained (for example,
+in the references, tables, supporting information, and other databases).
+
+All funding sources related to this work from all authors
+
+Any real or perceived financial conflicts of interests for any author
+
+Other affiliations for any author that may be perceived as having a
+conflict of interest with respect to the results of this paper.
+
+It is also the appropriate place to thank colleagues and other
+contributors.
+
+AGU does not normally allow dedications.

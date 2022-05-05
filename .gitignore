@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+
+/Data_Preparation/Input_Data/
+/Data_Preparation/Analysis_Data/
+/Misc_Analysis/
