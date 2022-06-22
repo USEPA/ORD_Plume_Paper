@@ -73,11 +73,19 @@
 
 \usepackage{soulutf8}
 \usepackage{float}
-\floatplacement{figure}{H}
-\usepackage{amsmath}
 \usepackage{booktabs}
-\usepackage{caption}
 \usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 
 \begin{document}
 
@@ -118,13 +126,9 @@
 \authors{
 Andrew R. Murray
 \affil{1, 2}
-\thanks{Andrew's thanks}
 Diego Riveros-Iregui
 \affil{1}
-\thanks{Current address: Some other place, Germany}
 Alexander Hall
-\affil{3}
-Fran Kremer
 \affil{3}
 }
 
@@ -165,8 +169,7 @@ and Development}
 % \end{keypoints}
 
 \begin{keypoints}
-\item Spatio-temporal patterns of benzene plumes are still poorly
-understood.
+\item Spatial extents of benzene plumes are still poorly understood.
 \item Most plumes are not spatially captured by groundwater testing.
 \item Better models are needed to inform monitoring well selection for
 leaking sites.
@@ -186,74 +189,77 @@ leaking sites.
 
 \begin{abstract}
 Underground storage tanks are tanks buried underground for the purpose
-of storing and dispensing a wide range of hazardous products. The
-primary use for these tanks are the storing and dispensing of fuel
-products such as gasoline and diesel. In the United States there are
-currently 540,000 open (in operation) tanks. Since 2000, there have been
-more than 118,000 reported releases. When fuel products release into the
-ground or onto the surface they can contaminate local soil and
+of storing and dispensing a wide range of hazardous products, primarily
+fuel products such as gasoline and diesel. In the United States there
+are currently 540,000 open (in operation) tanks. Since 2000, there have
+been more than 118,000 reported releases. When fuel products release
+into the ground or onto the surface they can contaminate local soil and
 groundwater resources, as well as pollute the air by means of vapor
 intrusion. Petroleum hydrocarbons, which are known carcinogens, pose a
 threat to human and environmental health. They can persist in the
 environment for decades, and can contaminate drinking water to unsafe
-levels before becoming detectable by smell or taste. Benzene is the most
-common petroleum hydrocarbon found in fuel products and several studies
-have been conducted on it's potential for movement in the environment,
-however these studies all generally contain a limited number of sites
-within a limited geographic area and much remains to be understood
-related to environmental drivers.
+levels which are less than the human threshold for smell or taste.
+Benzene is a carcinogenic petroleum hydrocarbon found in fuel products
+and several studies have been conducted on it's potential for
+mobilization in the environment, however these studies generally contain
+a limited number of sites within a limited geographic area and much
+remains to be understood related to environmental drivers.
 \end{abstract}
 \section{Introduction}
 
 Benzene, a carcinogenic component of petroleum products such as gasoline
 is known to be released into the environment as the result of leaking
 underground storage tanks (LUST). There are currently about 540,000
-active petroleum UST systems and a backlog of 62,000 LUST sites in the
-United States \citep{ustperformance} . The definition of a leaking
-underground storage tank can vary depending on which state or federal
-regulations you consider. The federal government considers reportable
-quantities of petroleum products to be anything over 25 gallons, or a
-spill that cannot be cleaned up within 24 hours \citep{coderegs}. Many
-studies have been done on benzene plume length and attenuation
-\citep[e.g.,][]{connor2015, kamath2012, shih2004evaluation}. However
+active petroleum underground storage tank (UST) systems and a backlog of
+62,000 LUST sites in the United States \citep{ustperformance}. The
+definition of a LUST or a release can vary depending on which state or
+federal regulations you consider. The federal government considers
+reportable quantities of petroleum products to be anything over 25
+gallons, or a spill that cannot be cleaned up within 24 hours
+\citep{coderegs}. Nationally, for about every 7 active USTs, one will
+report a release in it's lifetime \citep{ustperformance}. Many studies
+have been done on benzene plume length and attenuation
+\citep[e.g.,][]{connor2015, kamath2012, shih2004evaluation}. However,
 much is still unknown about the behavior and extent of benzene plumes.
 For example, while most papers focus on distance (one-dimensional),
 fewer characterize total impacted area (two-dimensional), and those that
-do, typically focus on only a relative few contaminated sites. A review
-paper on studies on benzene plume length showed that research on this
-area included between 22 to 289 LUST sites per study \citep{connor2015}.
-\citet{mchugh2014progress} included over 4,000 LUST sites, however this
-was not focused on distance or area but rather trends in concentration
-over time. A key reason for the limited number of sites included in
-these studies is data availability. Although states are required to test
-and characterize sites contaminated or suspected to be contaminated by
-leaking underground storage tanks, very limited amounts of these data
-are made public. In most of the papers cited here, authors accumulated
-limited amounts of field data from multiple agencies and sources. An
-exception to this is California's geotracker database, the largest
+do, typically focus on only a small number of contaminated sites. A
+review paper on studies of benzene plume length showed that research in
+this area included between 22 to 289 LUST sites per study
+\citep{connor2015}. \citet{mchugh2014progress} included over 4,000 LUST
+sites, however this was not focused on distance or area but rather
+trends in concentration over time. A key reason for the limited number
+of sites included in these studies is data availability. Although states
+are required to test and characterize sites contaminated or suspected to
+be contaminated by LUSTs, very limited amounts of these data are made
+public. In prior studies, authors accumulated limited amounts of field
+data from multiple agencies and sources. An exception to this limited
+data availability is California's Geotracker database, the largest
 publicly available database of its kind, which includes field data for
-leaking underground storage tank cleanup sites dating back to 2000.
+LUST cleanup sites dating back to 2000.
 
 There has yet to be a study done on benzene plume areas that
 sufficiently considers a large number of field studies, geographic
 diversity of sites, and two-dimensional plume shape. Further, no study
-has been able to offer insight into estimating plume locations, which
-could help to make future testing campaigns more efficient and accurate.
-In this paper, we aim to consider the largest number of field studies to
-date and to characterize benzene plume shapes and distances. To do this,
-we use data obtained from California's GeoTracker database and compare
-geotracker data with the findings of \citet{connor2015} to determine how
-a larger and more diverse sample size supports or disagrees with the
-findings of other studies. We then characterize two-dimensional benzene
-plume areas to determine the shape and distribution of benzene plumes.
-Finally, we determine how effective monitoring wells are at completely
-capturing benzene plumes in California. These essential investigations
-will help to determine if we can more accurately estimate plume extents
-in the future and suggest possible ways to make LUST site investigations
-and monitoring campaigns more efficient. California's geotracker
-database is a valuable and generally untapped resource of information
-which should be a model for other state agencies which are responsible
-for the cleanup of LUST sites.
+has been able to offer insight into how well plume areas are being
+captured by monitoring wells, which could help to make future testing
+campaigns more efficient and accurate. In this paper, we consider the
+largest number of field studies to date in a two-dimensional study and
+use publicly available data obtained from California's GeoTracker
+database to compare our findings with those of \citet{connor2015} to
+determine how a larger and more diverse sample size supports or
+disagrees with the findings of other studies. We then spatially
+normalize plumes by determining the mean linear direction of benzene
+flow and rotate them so as to artificially overlay them and determine
+the two-dimensional areas that are most commonly impacted relative to
+the LOP. Finally, we characterize two-dimensional benzene plume areas to
+determine how effective monitoring wells are at completely capturing
+benzene plumes in California and discuss the implications of our
+results. We find that in the vast majority of LUST cleanup sites, it is
+likely that plume areas are larger than previously thought. These
+essential investigations will help to determine if plumes are being
+effectively measured and inform future efforts to estimate plume
+extents.
 
 \section{Materials and Methods}
 
@@ -263,343 +269,259 @@ The definition of a release varies from state to state, however all
 states must report releases that meet or exceed the criteria of the
 federal reporting requirements. Many releases do not meet this threshold
 but may still appear in California's geotracker database. California
-defines a release as:
-
-\begin{quote}
-``{[}A{]} spill or overfill of a hazardous substance that meets both of
-the following conditions: (1) The spill or overfill occurs while the
-hazardous substance is being placed in an underground storage tank. (2)
-The spill or overfill is due to the use of improper equipment, faulty
-equipment, operator error, or inattention or overfilling
-\citep{careport25295.5}''
-\end{quote}
-
-In California, operators are not required to report a release or spill
-if they are ``able to clean up within eight hours after the release was
-detected or should reasonably have been detected, and which does not
-escape from the secondary containment, does not increase the hazard of
-fire or explosion, and does not cause any deterioration of the secondary
-containment of the underground storage tank.'' However the operator must
-record the incident in monitoring reports \citep{careport25294}. If
-these thresholds are exceeded, the operator must report the spill to the
-apropriate state agency \citep{careport25295}.
-
-\subsection{Geotracker}
-
-The data obtained from GeoTracker contains groundwater measurements from
-5293 unique leaking underground storage sites. Previous Studies have
-proposed that the maximum travel distance of benzene in the ground is
-between 300 and 1,700 feet and that the 90th percentile of benzene plume
-lengths is between 345 and 425 feet \citep{connor2015}. There are more
-than 500,000 underground storage tanks in the United States. For about
-every 7 active tanks, one will report a release in it's lifetime
-\citep{ustperformance}. Several studies exist which examine the
-distances and depths of benzene migration in the vadose zone, however
-most studies lack robust numbers of study sites as cleanup data is not
-widely available. Further, no studies exist which examine the
-two-dimensional footprints of benzene plumes at large scales or
-monitoring well placement relative to leak points. We examine over
-three-thousand leaking underground storage tank (LUST) site cleanups in
-California which exhibited measurable benzene plumes and determine
-characteristics of their spatial extents, flow directions and whether
-the monitoring wells used at the sites adequately capture plume extents.
-We determine (a) if geotracker data supports previous studies in
-1-dimensional maximum plume distance. (b) from a spatial perspective, if
-site monitoring efforts are effectively capturing 2-dimensional benzene
-plumes, (c) if benzene plumes have a pronounced shape to them and the
-size of impacted areas, and (d) discuss what can be done to make plume
-monitoring more effective and efficient in the future.
+defines a release as ``any spilling, leaking, emitting, discharging,
+escaping, leaching, or disposing from an underground storage tank into
+or on the waters of the state, the land, or the subsurface soils''
+\citep{careport25295.5}. In California, operators are not required to
+report a release or spill if they are ``able to clean up within eight
+hours after the release was detected or should reasonably have been
+detected, and which does not escape from the secondary containment, does
+not increase the hazard of fire or explosion, and does not cause any
+deterioration of the secondary containment of the underground storage
+tank.'' However the operator must record the incident in monitoring
+reports \citep{careport25294}. If these thresholds are exceeded, the
+operator must report the spill to the appropriate state agency
+\citep{careport25295}.
 
 \subsection{Determining Plume Length}
 
-There is no set definition for the point of origin for an underground
-storage tank release. This is common as most releases are discovered as
-a result of tank removal and it is often unclear from exactly where a
-release occurred. While the geotracker database does provide xy
-locations for both `UST / UST pit' and `former UST' locations, these
-data only exist at less than 200 of LUST cleanup sites. Therefore, we
-define the point of release as the point where benzene concentration was
-the highest at a given site. If there were multiple measurements of the
-maximum concentration at different points, the earliest measurement was
-used. As in \citet{connor2015}, the plume is defined as the total area
-above two separate thresholds, 5 ug/L and 10 ug/L to match with
-definitions used by previous studies. To be clear, the current federal
-MCL for benzene is 5 ug/L.
+The data obtained from GeoTracker contains groundwater samples from
+42,045 unique LUST sites, however the majority of these sites do not
+have multiple geolocated monitoring wells with groundwater samples in
+excess of the fedral MCL (5 ug/L). All data was downloaded from the
+Geotracker public data portal \citep{geotracker} by county, merged
+together and filtered to only sites defined as a `LUST Cleanup Site'.
+There is no specific way of determining origin point of a release. This
+is common as most releases are discovered as a result of tank removal
+and it is often unclear from exactly where a release occurred. While the
+geotracker database does provide xy locations for both `UST / UST pit'
+and `former UST' locations, these data only exist at less than 200 of
+LUST cleanup sites. Therefore, we define the leak origin point (LOP) as
+the point where benzene concentration was the highest at a given site.
+If there were multiple measurements of the maximum concentration at
+different points, the earliest measurement was used. As in
+\citet{connor2015}, the plume is defined as the distance between the LOP
+and the farthest monitoring well which had a sample above two separate
+thresholds, 5 ug/L and 10 ug/L to match with methods used by previous
+studies. To be clear, the current federal MCL for benzene is 5 ug/L. We
+only use the 10 ug/L threshold for comparison of benzene distance. To
+delineate two-dimensional areas of plumes, we use the EPA 5 ug/L MCL.
+Geolocations of wells were projected to the California Albers projection
+and measured in meters using the sf package \citep{sf}. All analysis in
+this paper was done with R statistical software \citep{R} and RStudio
+\citep{RStudio}.
 
 \subsection{Evaluating Capture of Plumes by Monitoring Wells}
 
-We look at plume extents compared to monitoring extents to determine if
-plumes are completely captured by monitoring wells or if concentrations
-greater than 5 ug/L are possibly extending beyond monitoring wells. To
-test this, we create convex hulls \citep{sf} of the monitoring wells
-which measured \(\ge 5 ug/L\) for every testing event for every site and
-also convex hulls for monitoring wells for every site. We define samples
-taken in a specific testing event as a time when the origination point
-was tested, and every sample taken from every well within ± 28 days.
+Benzene plumes have been shown to spread over time and can persist for
+decades. Additionally, benzene plumes can disconnect over time and it is
+possible to have separation into two plumes \citep{molson2002modeling},
+which could lead to undetected plumes beyond testing boundaries,
+especially if the leak was detected years after a release began. We
+evaluate plume extents compared with monitoring well extents to
+determine if plumes are completely captured by monitoring wells or if
+concentrations greater than 5 ug/L are possibly extending beyond
+monitoring wells. To test this, we create convex hulls \citep{sf} of the
+monitoring wells which measured \(\ge 5 ug/L\) for every site and also
+convex hulls for monitoring wells for every site. If a site has a sample
+that exceeds the federal MCL of 5 ug/L that is spatially coincident with
+the maximum testing boundary, we consider this `boundary exceedance'. If
+the testing boundary and the plume boundary do not intersect, and the
+plume is entirely within the testing boundary, we consider this `plume
+capture' (Figure 1).
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \includegraphics{CA_Benzene_Plumes_files/figure-latex/exceedsExample-1} \caption{Example of Plumes that are completely captured by monitoring wells (A) and plumes which likely travel beyond he extent of moniotring wells (B).}\label{fig:exceedsExample}
 \end{figure}
 
 \subsection{Normalizing Plume Direction}
 
-We map out the distribution of monitoring wells relative to the mean
-linear direction of a benzene plume. To determine the mean linear
-direction of benzene movement through the ground, we use weighted vector
-addition to determine the mean angle of flow in degrees from north. We
-then artificially rotate the plumes so that they are normalized to one
+We map the distribution of monitoring wells relative to the mean linear
+direction of a benzene plume. To determine the mean linear direction of
+benzene movement through the ground, we use weighted vector addition to
+determine the mean angle of flow in degrees from north. We then
+artificially rotate the plumes so that they are normalized to one
 direction (due north) and overlay them to map out monitoring wells
 relative to the leak point and direction of flow and regardless to
-actual location. All analysis was done in using the R statistical
-language \citep{R} within RStudio \citep{RStudio}. Coordinate math was
-done using sf \citep{sf} and bearing directions were calculated using
-stplanr \citep{stplanr}. Data cleaning relied on the tidyverse package
+actual location. Coordinate math was done using the sf package
+\citep{sf} and bearing directions were calculated using the stplanr
+package \citep{stplanr}. Data cleaning relied on the tidyverse package
 \citep{tidyverse}. To weight monitoring wells, benzene concentrations
 were multiplied by the distance in meters of the monitoring well from
 the LOP. Lines were then created using existing bearings for each
 monitoring well from the LOP and lengths from weighted distances. Lines
-were then drawn end to end and the mean linear direction was calculated
-as the bearing between the LOP and the end vertex of the final weighted
-line.
+were then redrawn end to end and the mean linear direction was
+calculated as the bearing between the LOP and the end vertex of the
+final weighted line (Figure 2).
 
-\begin{figure}[h]
-\includegraphics[width=400px,]{img/meanDirection} \caption{Illustration of mean direction calculation. Panel A shows actual locations and concentrations of benzene relative to LOP. Panel B shows weighted vector math result with mean linear direction calculation.}\label{fig:fig1}
+\begin{figure}[!h]
+\includegraphics{CA_Benzene_Plumes_files/figure-latex/fig1-1} \caption{Illustration of mean direction calculation. Panel A shows actual locations and concentrations of benzene relative to LOP. Panel B shows weighted vector math result with mean linear direction calculation.}\label{fig:fig1}
 \end{figure}
 
-We included all benzene samples in geotracker which were taken at LUST
-cleanup sites and were analyzed as either ug/L or mg/L (91.3\% of all
-samples). In total, we included 1.8 million benzene samples from 104,254
-geographically unique sampling points at 8,409 LUST cleanup sites. 7,058
-LUST cleanup sites had benzene concentrations greater than the MCL (5
-ug/L).
+For area analyses, we included all benzene samples in Geotracker which
+were taken at LUST cleanup sites and were analyzed as either ug/L or
+mg/L (91.3\% of all samples). Measurements in mg/L were converted to
+ug/L. In total, we included 3,495 sites which had at least 3 monitoring
+wells with benzene concentrations exceeding 5 ug/L so that a
+two-dimensional space could be delineated. These sites contained 63,916
+spatially unique monitoring wells, with 1,545,731 benzene samples,
+526,060 of which met or exceeded 5 ug/L.
+
+\subsection{Statistical Analysis}
+
+To determine if there is a statistically significant difference in plume
+sizes depending on whether a site exhibited boundary exceedance or plume
+capture we used the Wilcox test. If sites exhibiting plume capture are
+significantly different then sites exhibiting boundary exceedance, it
+could indicate that testing at sites that exhibit boundary exceedance
+are not effectively monitoring the plumes. Finally, we show the measured
+distances from the LOP for all monitoring wells used in the
+two-dimensional analysis to contextualize the findings of the Wilcox
+test.
 
 \section{Results}
 
 \subsection{Maximum Plume Distance}
 
-Figure 2 shows the maximum distance benzene was measured from the point
-of origination.
+Plume maximum distances were calculated for 5,624 sites which had
+measurable distances (at least 2 unique monitoring wells) with
+\(\ge 10 ug/L\) and 5,881 sites which had measurable distances with
+\(\ge 5 ug/L\) (Figure 3). The median distance for plumes delineated at
+10 ug/L was 27.7249 meters. The 90th percentile distance of plumes
+delineated at 10 ug/L was 84.2 meters. The median distance for plumes
+delineated at 5 ug/L was 29.42471 meters. The 90th percentile distance
+of plumes delineated at 5 ug/L was 87.4 meters
 
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/maxDist-1} \caption{Maximum calculated distance of benzene plumes in meters using a threshold of 10 ug/L.}\label{fig:maxDist}
+Figure 3 shows the maximum distance benzene that was measured from the
+point of origination. The 90th percentile for benzene distance is 595
+feet for 5 ug/L which falls within the findings of \citet{connor2015}.
+
+\begin{figure}[!h]
+\includegraphics{CA_Benzene_Plumes_files/figure-latex/maxDistPlots-1} \caption{Histogram of maximum measured distance of benzene plumes in meters using thresholds of 10 ug/L (A) and 5 ug/L (B). Maximum distances from previous studies are overlaid. The width of bins is 10m.}\label{fig:maxDistPlots}
 \end{figure}
 
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/boundaryExceedance-1} \caption{Exceedance classification for every LUST cleanup site in California with more than 3 sampling points > 5 ug/L shown with maximum plume distance and median concentration at site.}\label{fig:boundaryExceedance}
+\subsection{Directionally Normalized Plumes and Study Areas}
+
+We found 3,495 plumes with at least 3 points with benzene concentrations
+\(\ge 5 ug/L\). We calculated mean linear direction of benzene flow and
+rotated each plume to due north. Each plume was overlaid by shifting the
+leak origination point to the coordinates (0,0) in the California albers
+projection.
+
+\begin{figure}[!h]
+
+{\centering \includegraphics{CA_Benzene_Plumes_files/figure-latex/AllplumeAreas-1} 
+
+}
+
+\caption{Visualization of all monitoring areas and plume areas superimposed on top of eachother. Line transparency = 95 percent.}\label{fig:AllplumeAreas}
 \end{figure}
-
-2,597 of 3,300 cleanup sites had an exceedance of 5 ug/L at the testing
-boundary (78.7\%)
-
-\subsection{Overlayed Plumes and Study Areas}
-
-\begin{itemize}
-\tightlist
-\item
-  We found 4,202 plumes with at least 3 points with benzene
-  concentrations \textgreater= 5 ug/L. We calculated mean linear
-  direction of benzene flow and rotated each plume to due north. Each
-  plume was overlaid by shifting the leak origination point to the
-  coordinates (0,0) in the California albers projection.
-\end{itemize}
-
-All Plumes and Study Areas
-
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/AllplumeAreas-1} \caption{Please caption every figure}\label{fig:AllplumeAreas}
-\end{figure}
-
-\subsection{Plumes entirely within testing boundary}
-
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/plumesinBoundary-1} \caption{Please caption every figure}\label{fig:plumesinBoundary}
-\end{figure}
-
-\subsection{Are plumes that are completely captured, significantly
-smaller than plumes that have boundary exceedance?}
-
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/plumeAreaCompare-1} \caption{Please caption every figure}\label{fig:plumeAreaCompare}
-\end{figure}
-
-This plot tells us that when plumes are completely captured (spatially)
-that they are not larger than if plumes extend to the boundary of a
-monitoring network. This suggests that plumes, in general, are larger
-than the data suggests. Measured plumes get larger as monitored areas
-get larger.
 
 \subsection{Wilcox Test}
 
-Wilcox Results:
+2,908 of 3,495 cleanup sites had an exceedance of 5 ug/L at the testing
+boundary (83.20458). Figure 4 illustrates that when plumes are
+completely captured (spatially), they are generally smaller than if
+plumes extend to the boundary of a monitoring network. The results of
+the Wilcox test (Table 1) show a significant difference between the
+measured plume areas at sites where boundary exceedance was observed and
+at sites where entire plume capture was observed (figure 5). Plume areas
+are statistically larger at sites where plumes were entirely captured,
+and the majority of plumes exhibited boundary exceedance across their
+monitoring well extents. The median plume area where plume capture was
+observed was 416 m\textsuperscript{2}. The median plume area where
+boundary exceedance was observed was 983 m\textsuperscript{2}, more than
+twice as much area as plumes that were spatially captured.
 
-\captionsetup[table]{labelformat=empty,skip=1pt}
-\begin{longtable}{lllrrrr}
-\toprule
-.y. & group1 & group2 & n1 & n2 & statistic & p \\ 
-\midrule
-Plume\_Area & FALSE & TRUE & 703 & 2597 & 646968 & 1.82e-32 \\ 
-\bottomrule
-\end{longtable}
+\begin{figure}[!h]
+\includegraphics{CA_Benzene_Plumes_files/figure-latex/plumeAreaCompare-1} \caption{Visulization of plume areas by whether they exhibited boundary capture (green/left) or boundary exceedance (brown/right).}\label{fig:plumeAreaCompare}
+\end{figure}
+\begin{table}[H]
 
-Effect Size:
+\caption{\label{tab:wilcox}Wilcox Test Results}
+\centering
+\begin{tabular}[t]{l|l|l|r|r|r|r|r}
+\hline
+Y & Group 1 & Group 2 & n1 & n2 & Statistic & p & Effect\\
+\hline
+Area\_m & FALSE & TRUE & 587 & 2908 & 559822 & 0 & 0.2228\\
+\hline
+\end{tabular}
+\end{table}
 
-\captionsetup[table]{labelformat=empty,skip=1pt}
-\begin{longtable}{rc}
-\toprule
-effsize & magnitude \\ 
-\midrule
-0.206528 & small \\ 
-\bottomrule
-\end{longtable}
+\subsection{Monitoring Well Distances}
 
-\section{Conclusions}
+The distances of all spatially unique monitoring wells were measured
+from their respective LOPs. Figure 6 shows a histogram as well as the
+25th, 50th, 75th and 90th percentiles of maximuim benzene plume
+distances. The median distance of all monitoring wells from the LOP was
+30.03 meters. 90\% of monitoring wells were within 87.78 meters of the
+LOP.
 
-\begin{itemize}
-\item
-  Plumes are not being effectively captured by monitoring wells
-
-  \begin{itemize}
-  \item
-    When plumes are completely captured by monitoring wells, the plumes
-    tend to be smaller, suggesting that larger plumes are not being
-    reflected in the data and that, in general, monitoring wells are
-    placed at fixed distances.
-  \item
-    As Plumes get larger, they are less likely to be captured by
-    monitoring wells
-  \end{itemize}
-\item
-  There is no clear issue with the radial coverage from a leaking point
-
-  \begin{itemize}
-  \tightlist
-  \item
-    The data does not support the hypothesis that monitoring wells are
-    not placed in directions other than the dominant flow direction of
-    benzene.
-  \end{itemize}
-\item
-  Benzene plumes appear to exhibit radial characteristics with a skewed
-  dominant flow direction.
-\end{itemize}
-
-\section{NOTES}
-
-\begin{verbatim}
-## New names:
-## * `` -> ...1
-\end{verbatim}
-
-\begin{verbatim}
-## Rows: 1000 Columns: 3
-## -- Column specification --------------------------------------------------------
-## Delimiter: ","
-## dbl (3): ...1, Distance_m, countWells
-## 
-## i Use `spec()` to retrieve the full column specification for this data.
-## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
-\end{verbatim}
-
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/unnamed-chunk-2-1} \caption{Please caption every figure}\label{fig:unnamed-chunk-2}
+\begin{figure}[!h]
+\includegraphics{CA_Benzene_Plumes_files/figure-latex/mwDistsPlot-1} \caption{Histogram of monitoring well distances used in area analysis with the 25th, 50th, 75th and 90th percentiles overlaid. Bin width = 5m}\label{fig:mwDistsPlot}
 \end{figure}
 
-\begin{verbatim}
-## Warning: Removed 178 rows containing missing values (geom_point).
-\end{verbatim}
+\section{Conclusions \& Discussion}
 
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/unnamed-chunk-3-1} \caption{Please caption every figure}\label{fig:unnamed-chunk-3}
-\end{figure}
+While statistically, the maximum distance of 90\% of plumes falls within
+the bounds of previous research, this is not necessarily the best way to
+consider potential impacts of petroleum hydrocarbons in the environment.
+California for example has particularly strict reporting requirements,
+meaning that even very small releases are documented, and the sites
+undergo soil and groundwater testing, leading to a disproportionate
+weighting of plumes towards smaller releases relative to documented
+releases in other states which have reporting requirements more aligned
+with federal regulations. However, there are still many plumes of
+concern that reach beyond the ninetieth percentile, in this case 589
+sites. Further, our research finds that the vast majority of plumes
+recorded are likely larger then previously thought, with maximum
+distances that are longer than have been reported in the data. While
+previous research has not stated whether or not plumes were entirely
+captured by monitoring, it stands to reason that prior site
+investigations may have suffered from the same limitations as are
+present in the geotracker data. Limitations to testing often include
+both physical impediments and property boundaries. For example, many gas
+stations are located in urbanized areas, meaning that impervious, paved
+surfaces and other structures can limit the areas where testing is
+possible. Additionally, there may be several other private properties
+within a very small distance, making getting permission to test
+difficult. Releases can enter the ground in many ways. The release can
+originate underground, directly from a tank that has suffered corrosion,
+or from leaky piping connections, or it can originate on the surface
+from a spill or overfill and migrate into the ground directly, or
+through overland flow and via preferential pathways such as cracked
+pavement.
 
-Driving Questions:
-
-\begin{itemize}
-\item
-  Does our data support the conclusions form other studies on plume
-  length?
-\item
-  From a spatial perspective, are site monitoring efforts effectively
-  capturing the complete extent of benzene plumes?
-\item
-  What are the shapes of plumes? Are they flowing in a single direction,
-  or are they spreading outwards in many directions?
-\item
-  Are there systematic issues in the way that monitoring wells are
-  located? Are we looking in the right places?
-\item
-  Can we contribute to better monitoring in the future?
-\end{itemize}
-
-\subsection{Plot Points where MCL is exceeded at boundary}
-
-In the plot below, we show every point where the mcl was exceeded at a
-testing boundary. If there were a systematic pattern of areas where
-monitoring wells were not being drilled, we would expect to see a more
-concentrated number of points. For example, if technicians were not
-looking far enough away from leak points in the opposite direction of
-the mean linear flow direction of benzene, we would expect to see a
-concentration of points in the area of y \textless{} 0. However, we do
-not see any such pattern. Instead, we see a pattern similar to the
-general plume shape. This indicates that there is no systematic issue
-with where monitoring wells are placed, at least there is no area that
-is being missed more than any other.
-
-\begin{figure}[h]
-\includegraphics{CA_Benzene_Plumes_files/figure-latex/boundaryPts-1} \caption{Please caption every figure}\label{fig:boundaryPts}
-\end{figure}
-
-\appendix
-\section{Here is a sample appendix}
-
-Optional Appendix goes here
-
-Optional Glossary, Notation or Acronym section goes here:
-
-Glossary is only allowed in Reviews of Geophysics
-
-\begin{glossary}
-\term{Term}
- Term Definition here
-\term{Term}
- Term Definition here
-\term{Term}
- Term Definition here
-\end{glossary}
-
-\begin{acronyms}
-\acro{UST}
- Underground Storage Tanks
-\acro{LUST}
- Leaking Underground Storage Tank
-\end{acronyms}
-
-\begin{notation}
-\notation{$a+b$} Notation Definition here
-\notation{$e=mc^2$}
-Equation in German-born physicist Albert Einstein's theory of special
-relativity that showed that the increased relativistic mass ($m$) of a
-body comes from the energy of motion of the body—that is, its kinetic
-energy ($E$)—divided by the speed of light squared ($c^2$).
-\end{notation}
+Our findings suggest that plumes are larger than the data suggests.
+Plumes are significantly larger when they are not captured by monitoring
+wells, suggesting that the sites which exhibit plume capture may be
+doing so simply because they are smaller in tw0-dimensional area. Larger
+plumes are less likely to be completely captured because the burden for
+doing so is higher. While the limitations of testing in the real world
+are clear, and are not likely to be overcome in their entirety, this
+research clearly shows that there is still much that is unknown about
+how benzene plumes move through the environment and how much area they
+can impact in unsafe levels. There is a need for better modelling and
+understanding of these plumes. If we are able to more effectively model
+the full extent of benzene plumes, we may be able to aid in future site
+investigations without an additional burden on agencies responsible for
+site testing and characterization. While on-site sampling will always be
+the most reliable way to characterize a plume, additional modelling and
+understanding may help future site investigations to be more efficient
+by helping to prioritize monitoring well locations.
 
 \acknowledgments
 
-The acknowledgments must list: A statement that indicates to the reader
-where the data supporting the conclusions can be obtained (for example,
-in the references, tables, supporting information, and other databases).
-
-All funding sources related to this work from all authors
-
-Any real or perceived financial conflicts of interests for any author
-
-Other affiliations for any author that may be perceived as having a
-conflict of interest with respect to the results of this paper.
-
-It is also the appropriate place to thank colleagues and other
-contributors.
-
-AGU does not normally allow dedications.
+The authors of this paper have no conflicts of interest to declare. The
+views expressed in this paper are those of the authors and do not
+necessarily represent the views or policies of the U.S. Environmental
+Protection Agency. All analysis, statistics and spatial analyses were
+completed using R version 4.1.2. All California LUST data were obtained
+from the California Water Board's Geotracker public portal
+(https://geotracker.waterboards.ca.gov/data\_download\_by\_county). All
+code used in this research is publicly available on GitHub
+(https://github.com/USEPA/ORD\_Plume\_Paper).
 
 \bibliography{references.bib}
 
