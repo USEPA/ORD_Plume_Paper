@@ -104,6 +104,8 @@ sites contaminated or suspected to be contaminated by LUSTs, very limited amount
 amounts of field data from multiple agencies and sources. An exception
 to this limited data availability is California's Geotracker database, the largest publicly available database of its kind, which includes field data for LUST cleanup sites dating back to 2000.
 
+An extensive body of work exists relating to groundwater transport of components of gasoline products. Many compounds besides benzene have been studied such as Methyl tert-butyl ether (MTBE) and tert-Butyl alcohol (TBA). Many environmental and chemical-specific factors play into transportability of various compounds through the soil such as soil permeability, water table, solubility, sorption, and retardation to name a few. MTBE and TBA for example, like benzene and BTEX in general are light non aqueous phase liquids, meaning that they generally float on top of the water table, whereas other compounds such as chlorinated aliphatic hydrocarbons (CAHs) are dense non-aqueous phase liquids which sink into the water table \citep{Stupp2007fuel}. MTBE has a solubility in water of 51,000 mg/L \citep{pubchemMTBE}, TBA has a solubility in water of 1,000,000 mg/L \citep{pubchemTBA}, Tetrachloroethylene (PCE), a CAH, which is generally used in industrial and dry-cleaning applications has a solubility in water of 206 mg/L \citep{pubchemPCE}. Benzene has a solubility in water of 17,900 mg/L \citep{pubchemBenz}. Studies have shown that MTBE and TBA, in general behave much like benzene, but exhibit longer plumes. MTBE plumes stretching 1,800 meters have been documented, whereas CAHs have documented plumes extending more than 8,000 meters \citep{Stupp2007fuel}. The implications of these findings suggest that, at a minimum, the factors which drive groundwater transport of compounds related to gasoline and industrial use are highly complex and remain inadequately understood.
+
 There has yet to be a study done on benzene plume areas that
 sufficiently considers a large number of field studies, geographic
 diversity of sites, and two-dimensional plume shape. Further, no study
@@ -113,15 +115,9 @@ date in a two-dimensional study and use publicly available data obtained from Ca
 
 # Materials and Methods
 
-## California release definitions
+## Release definitions
 
 The definition of a release varies from state to state, however all states must report releases that meet or exceed the criteria of the federal reporting requirements. Many releases do not meet this threshold but may still appear in California's geotracker database. California defines a release as "any spilling, leaking, emitting, discharging, escaping, leaching, or disposing from an underground storage tank into or on the waters of the state, the land, or the subsurface soils" \citep{careport25295.5}. In California, operators are not required to report a release or spill if they are "able to clean up within eight hours after the release was detected or should reasonably have been detected, and which does not escape from the secondary containment, does not increase the hazard of fire or explosion, and does not cause any deterioration of the secondary containment of the underground storage tank." However the operator must record the incident in monitoring reports \citep{careport25294}. If these thresholds are exceeded, the operator must report the spill to the appropriate state agency \citep{careport25295}.
-
-
-## Determining Plume Length
-
-The data obtained from GeoTracker contains groundwater samples from
-`r format(length(unique(sites$GLOBAL_ID)),big.mark = ",")` unique LUST sites, however the majority of these sites do not have multiple geolocated monitoring wells with groundwater samples in excess of the fedral MCL (5 ug/L). All data was downloaded from the Geotracker public data portal \citep{geotracker} by county, merged together and filtered to only sites defined as a 'LUST Cleanup Site'. There is no specific way of determining origin point of a release. This is common as most releases are discovered as a result of tank removal and it is often unclear from exactly where a release occurred. While the geotracker database does provide xy locations for both 'UST / UST pit' and 'former UST' locations, these data only exist at less than 200 of LUST cleanup sites. Therefore, we define the leak origin point (LOP) as the point where benzene concentration was the highest at a given site. If there were multiple measurements of the maximum concentration at different points, the earliest measurement was used. As in \citet{connor2015}, the plume is defined as the distance between the LOP and the farthest monitoring well which had a sample above two separate thresholds, 5 ug/L and 10 ug/L to match with methods used by previous studies. To be clear, the current federal MCL for benzene is 5 ug/L. We only use the 10 ug/L threshold for comparison of benzene distance. To delineate two-dimensional areas of plumes, we use the EPA 5 ug/L MCL. Geolocations of wells were projected to the California Albers projection and measured in meters using the sf package \citep{sf}. All analysis in this paper was done with R statistical software \citep{R} and RStudio \citep{RStudio}.
 
 ## Evaluating Capture of Plumes by Monitoring Wells
 
@@ -209,7 +205,19 @@ plot_grid(prow,legend,rel_widths = c(3,1))
 
 ```
 
-## Normalizing Plume Direction
+For area analyses, we included all benzene samples in Geotracker which were taken at LUST cleanup sites and were analyzed as either ug/L or mg/L (91.3% of all
+samples). Measurements in mg/L were converted to ug/L. In total, we included `r format(nrow(bd),big.mark = ",")` sites which had at least 3 monitoring wells with benzene concentrations exceeding 5 ug/L so that a two-dimensional space could be delineated. These sites contained `r format(nrow(mwAll),big.mark=",")` spatially unique monitoring wells, with `r format(nrow(benzSampleCount),big.mark=",")` benzene samples, `r format(nrow(gtMCLcount),big.mark = ",")` of which met or exceeded 5 ug/L.
+
+### Boundary Capture driven by Plume Size
+To determine if there is a statistically significant difference in plume sizes depending on whether a site exhibited boundary exceedance or plume capture we used the Wilcox test. If sites exhibiting plume capture are significantly different then sites exhibiting boundary exceedance, it could indicate that testing at sites that exhibit boundary exceedance are not effectively monitoring the plumes. Finally, we show the measured distances from the LOP for all monitoring wells used in the two-dimensional analysis to contextualize the findings of the Wilcox test.
+
+## Determining Plume Length
+
+The data obtained from GeoTracker contains groundwater samples from
+`r format(length(unique(sites$GLOBAL_ID)),big.mark = ",")` unique LUST sites, however the majority of these sites do not have multiple geolocated monitoring wells with groundwater samples in excess of the fedral MCL (5 ug/L). All data was downloaded from the Geotracker public data portal \citep{geotracker} by county, merged together and filtered to only sites defined as a 'LUST Cleanup Site'. There is no specific way of determining origin point of a release. This is common as most releases are discovered as a result of tank removal and it is often unclear from exactly where a release occurred. While the geotracker database does provide xy locations for both 'UST / UST pit' and 'former UST' locations, these data only exist at less than 200 of LUST cleanup sites. Therefore, we define the leak origin point (LOP) as the point where benzene concentration was the highest at a given site. If there were multiple measurements of the maximum concentration at different points, the earliest measurement was used. As in \citet{connor2015}, the plume is defined as the distance between the LOP and the farthest monitoring well which had a sample above two separate thresholds, 5 ug/L and 10 ug/L to match with methods used by previous studies. To be clear, the current federal MCL for benzene is 5 ug/L. We only use the 10 ug/L threshold for comparison of benzene distance. To delineate two-dimensional areas of plumes, we use the EPA 5 ug/L MCL. Geolocations of wells were projected to the California Albers projection and measured in meters using the sf package \citep{sf}. All analysis in this paper was done with R statistical software \citep{R} and RStudio \citep{RStudio}.
+
+
+## Characterization of Plume Shape 
 
 We map the distribution of monitoring wells relative to the mean
 linear direction of a benzene plume. To determine the mean linear
@@ -447,18 +455,13 @@ gtMCLcount <- td%>%
 ```
 
 
-For area analyses, we included all benzene samples in Geotracker which were taken at LUST cleanup sites and were analyzed as either ug/L or mg/L (91.3% of all
-samples). Measurements in mg/L were converted to ug/L. In total, we included `r format(nrow(bd),big.mark = ",")` sites which had at least 3 monitoring wells with benzene concentrations exceeding 5 ug/L so that a two-dimensional space could be delineated. These sites contained `r format(nrow(mwAll),big.mark=",")` spatially unique monitoring wells, with `r format(nrow(benzSampleCount),big.mark=",")` benzene samples, `r format(nrow(gtMCLcount),big.mark = ",")` of which met or exceeded 5 ug/L.
-
-## Statistical Analysis
-To determine if there is a statistically significant difference in plume sizes depending on whether a site exhibited boundary exceedance or plume capture we used the Wilcox test. If sites exhibiting plume capture are significantly different then sites exhibiting boundary exceedance, it could indicate that testing at sites that exhibit boundary exceedance are not effectively monitoring the plumes. Finally, we show the measured distances from the LOP for all monitoring wells used in the two-dimensional analysis to contextualize the findings of the Wilcox test.
-
-
 # Results
 
-## Maximum Plume Distance
+```{r resultCode}
 
-```{r maxDistFilt}
+# CODE IS NOT IN ORDER OF METHODS PRESENTED
+
+# --- DISTANCE CODE ---
 # 10 ug/L
 maxDist10 <- td%>%
   filter(PARVAL >= 10)%>%
@@ -496,12 +499,7 @@ ft10 <- ninety10*3.28084
 # Get ninetieth percentile for 5 ug/L
 ninety5 <- quantile(maxDist5$maxDist,.9)
 
-```
-
-Plume maximum distances were calculated for `r format(nrow(maxDist10),big.mark = ",")` sites which had measurable distances (at least 2 unique monitoring wells) with $\ge 10 ug/L$ and `r format(nrow(maxDist5),big.mark=",")` sites which had measurable distances with $\ge 5 ug/L$ (Figure 3). The median distance for plumes delineated at 10 ug/L was `r format(median(maxDist10$maxDist),nsmall=1)` meters. The 90th percentile distance of plumes delineated at 10 ug/L was `r format(ninety10,digits = 0,nsmall=1)` meters. The median distance for plumes delineated at 5 ug/L was `r format(median(maxDist5$maxDist),nsmall=1)` meters. The 90th percentile distance of plumes delineated at 5 ug/L was `r format(ninety5,digits=0,nsmall=1)` meters
-
-Figure 3 shows the maximum distance benzene that was measured from the point of origination. The 90th percentile for benzene distance is 595 feet for 5 ug/L which falls within the findings of \citet{connor2015}.
-```{r maxDistPlots, message = FALSE, warning=FALSE, fig.height=5, fig.width=5.5, fig.cap="Histogram of maximum measured distance of benzene plumes in meters using thresholds of 10 ug/L (A) and 5 ug/L (B). Maximum distances from previous studies are overlaid. The width of bins is 10m."}
+# --- DISTANCE PLOTS ---
 max10Plot <- ggplot(maxDist10Pdf)+
   geom_histogram(aes(x = maxDist),binwidth = 10,color = "black",fill = "#c7ae3e")+
   xlim(0,640)+
@@ -536,12 +534,6 @@ max5Plot <- ggplot(maxDist5Pdf)+
         labels=c("0", "200", "400","> 600"))+
   theme(plot.margin = margin(-.1, 0, 0, 0, "cm"))
 
-plot_grid(max10Plot,max5Plot, align = "v",
-          nrow = 2,
-          labels = c("A","B"),
-          label_x = .1,
-          label_y = c(.85,.95))
-
 ## Join max distance and median PARVAL
 medPARVAL <- td%>%
   filter(PARVAL > 0)%>%
@@ -550,59 +542,8 @@ medPARVAL <- td%>%
   ungroup()%>%
   select(GLOBAL_ID,medPARVAL)%>%
   distinct()
-```
 
-```{r ecdf,fig.height= 3,fig.width = 6, fig.cap="Cumulative Distribution Function of plume lengths (5 ug/L)."}
-# Calculate MinorityLowincome Weighted Percentiles (AEJ2)
-# ecdf.results <- Hmisc::wtd.Ecdf(bd$max_Dist, normwt = FALSE, type='i/n',
-#                                 na.rm=TRUE)%>%
-#   as.data.frame()
-# ggplot(ecdf.results)+
-#   geom_line(aes(x = x, y = ecdf*100),size = 1.5)+
-#   xlim(0,600)+
-#   labs(title = "Cumulative Distrubtion of Plume Lengths",x = "Maximum Distance [m]", y = "Percent of Plumes")
-```
-
-
-
-```{r boundaryExceedance, message = FALSE, warning=FALSE, fig.height = 3.5, fig.width = 6, fig.cap="Exceedance classification for every LUST cleanup site in California with more than 3 sampling points > 5 ug/L shown with maximum plume distance and median concentration at site."}
-# Script 06_Boundary_Detection.R
-
-# plotAll <- ggplot(bd)+
-#   geom_point(aes(x = max_Dist, y = median_Parval, color = BoundIntrsct), alpha = .5)+
-#   scale_color_manual(values = c("#1b9e77","#d95f02"))+
-#   scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))+
-#   labs(title = "MCL Exceedance Measured at Testing Boundary",
-#        x = "Distance from Release [m]",
-#        y = "Median Benzene Concentration at Site [ug/L]",
-#        color = "MCL Exceeded")+
-#   xlim(0,600)+
-#   ylim(0,25000)
-# 
-# ## Zoom in
-# bdSub <- bd%>%
-#   filter(median_Parval < 1000 & max_Dist < 200)
-# plotSub <- ggplot(bdSub)+
-#   geom_point(aes(x = max_Dist, y = median_Parval, color = BoundIntrsct),
-#              show.legend = FALSE, alpha = .5)+
-#   scale_color_manual(values = c("#1b9e77","#d95f02"))+
-#   labs(title = "",
-#        x = "",
-#        y = "",
-#        color = "MCL Exceeded")+
-#   scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))+
-#   theme(panel.border = element_rect(colour = "black", fill=NA, size=2))
-# 
-# plotAll + annotation_custom(ggplotGrob(plotSub), xmin = 200, xmax = 600,
-#                        ymin = 10000, ymax = 28000)
-```
-
-
-## Directionally Normalized Plumes and Study Areas
-We found `r format(nrow(bd),big.mark = ",")` plumes with at least 3 points with benzene concentrations $\ge 5 ug/L$. We calculated mean linear direction of benzene flow and rotated each plume to due north. Each plume was overlaid by shifting the leak origination point to the coordinates (0,0) in the California albers projection.
-
-
-```{r AllplumeAreas, message = FALSE, warning=FALSE,fig.align = "center",fig.height = 4.5,fig.width=5, fig.cap="Visualization of all monitoring areas and plume areas superimposed on top of eachother. Line transparency = 95 percent."}
+# --- NORMALIZED DIRECTION CODE/PLOTS ---
 # Join boundary detection to plume lines
 areasBound <- plumeAreas%>%
   left_join(bd, by = "GLOBAL_ID")
@@ -665,10 +606,9 @@ areaPlots <- ggplot(allAreas)+
   facet_wrap(~facet)+
   theme(plot.margin=unit(c(0,0,0,0), "cm"))+
   guides(colour = guide_legend(override.aes = list(alpha = 1),title=""))
-areaPlots
-```
 
-```{r boundCount}
+
+# --- SUBSET DATA BASED ON BOUNDARY EXCEEDANCE ---
 areaCompare <- bd%>%
   left_join(plumeAreas, by = "GLOBAL_ID")
 
@@ -678,46 +618,7 @@ capture <- areaCompare%>%
 exceedance <- areaCompare%>%
   filter(BoundIntrsct == TRUE)
 
-```
-
-## Wilcox Test
-`r format(nrow(exceedance), big.mark = ",")` of `r format(nrow(bd),big.mark = ",")` cleanup sites had an exceedance of 5 ug/L at the testing
-boundary (`r format(100*(nrow(exceedance)/nrow(bd)),nsmall = 1)`). Figure 4 illustrates that when plumes are completely captured (spatially), they are generally smaller than if plumes extend to the boundary of a monitoring network. The results of the Wilcox test (Table 1) show a significant difference between the measured plume areas at sites where boundary exceedance was observed and at sites where entire plume capture was observed (figure 5). Plume areas are statistically larger at sites where plumes were entirely captured, and the majority of plumes exhibited boundary exceedance across their monitoring well extents. The median plume area where plume capture was observed was `r format(median(capture$Area_m),digits=0,nsmall=0,big.mark=",")` m^2^. The median plume area where boundary exceedance was observed was `r format(median(exceedance$Area_m),digits=0,nsmall=0,big.mark=",")` m^2^, more than twice as much area as plumes that were spatially captured.
-
-
-
-```{r plumeAreaCompare, message = FALSE, warning=FALSE,fig.height = 2.5,fig.width=5, fig.cap="Visulization of plume areas by whether they exhibited boundary capture (green/left) or boundary exceedance (brown/right)."}
-
-
-ggplot(areaCompare)+
-  geom_boxplot(aes(x = BoundIntrsct, y = Area_m, fill = BoundIntrsct),outlier.alpha = .5)+
-  scale_fill_manual(values = c("#1b9e77","#d95f02"))+
-  coord_cartesian(ylim=c(0, 6000))+
-  labs(x = "Boundary Exceedance", y = "Plume Area [m^2]",
-       fill = "Plume at Boundary")
-```
-```{r wilcox, message = FALSE, warning=FALSE, fig.cap= "Results for Wilcox test on whether plumes that exhibited boundary exceedance are statistically different than plumes that did not exhibit boundary exceedance."}
-wx <- areaCompare%>%
-      rstatix::wilcox_test(Area_m ~ BoundIntrsct, p.adjust.method = "bonferroni")%>%
-      as.data.frame()
-
-pw.effect <- areaCompare%>%
-      rstatix::wilcox_effsize(Area_m ~ BoundIntrsct)%>%
-      as.data.frame()%>%
-      select(effsize,magnitude)
-
-tbl <- cbind(wx,pw.effect)%>%
-  select(".y.",group1,group2,n1,n2,statistic,p,effsize)%>%
-  mutate(effsize = round(effsize,4))
-
-colnames(tbl) <- c("Y","Group 1", "Group 2","n1","n2","Statistic","p","Effect")
-
-kbl(tbl,caption = "Wilcox Test Results")%>%
-  kable_styling(latex_options = "HOLD_position")
-```
-
-## Monitoring Well Distances
-```{r mwDists}
+# --- MONITORING WELL DISTANCE CODE ---
 uniqueMW <- td%>%
   filter(POINT_TYPE == "MW" & GLOBAL_ID %in% bd$GLOBAL_ID)%>%
   select(GISID,Distance_m)%>%
@@ -729,7 +630,79 @@ distQuantiles <- as.data.frame(quantile(uniqueMW$Distance_m,c(.25,.5,.75,.9)))%>
 
 uniqueMWPdf <- uniqueMW%>%
   mutate(Distance_m = ifelse(Distance_m > 200,200,Distance_m))
+
 ```
+
+
+## Maximum Plume Distance
+
+Plume maximum distances were calculated for `r format(nrow(maxDist10),big.mark = ",")` sites which had measurable distances (at least 2 unique monitoring wells) with $\ge 10 ug/L$ and `r format(nrow(maxDist5),big.mark=",")` sites which had measurable distances with $\ge 5 ug/L$ (Figure 3). The median distance for plumes delineated at 10 ug/L was `r format(median(maxDist10$maxDist),nsmall=1)` meters. The 90th percentile distance of plumes delineated at 10 ug/L was `r format(ninety10,digits = 0,nsmall=1)` meters. The median distance for plumes delineated at 5 ug/L was `r format(median(maxDist5$maxDist),nsmall=1)` meters. The 90th percentile distance of plumes delineated at 5 ug/L was `r format(ninety5,digits=0,nsmall=1)` meters
+
+Figure 3 shows the maximum distance benzene that was measured from the point of origination. The 90th percentile for benzene distance is 595 feet for 5 ug/L which falls within the findings of \citet{connor2015}.
+```{r maxDistPlots, message = FALSE, warning=FALSE, fig.height=5, fig.width=5.5, fig.cap="Histogram of maximum measured distance of benzene plumes in meters using thresholds of 10 ug/L (A) and 5 ug/L (B). Maximum distances from previous studies are overlaid. The width of bins is 10m."}
+plot_grid(max10Plot,max5Plot, align = "v",
+          nrow = 2,
+          labels = c("A","B"),
+          label_x = .1,
+          label_y = c(.85,.95))
+```
+
+```{r ecdf,fig.height= 3,fig.width = 6, fig.cap="Cumulative Distribution Function of plume lengths (5 ug/L)."}
+# Calculate MinorityLowincome Weighted Percentiles (AEJ2)
+# ecdf.results <- Hmisc::wtd.Ecdf(bd$max_Dist, normwt = FALSE, type='i/n',
+#                                 na.rm=TRUE)%>%
+#   as.data.frame()
+# ggplot(ecdf.results)+
+#   geom_line(aes(x = x, y = ecdf*100),size = 1.5)+
+#   xlim(0,600)+
+#   labs(title = "Cumulative Distrubtion of Plume Lengths",x = "Maximum Distance [m]", y = "Percent of Plumes")
+```
+
+
+
+```{r boundaryExceedance, message = FALSE, warning=FALSE, fig.height = 3.5, fig.width = 6, fig.cap="Exceedance classification for every LUST cleanup site in California with more than 3 sampling points > 5 ug/L shown with maximum plume distance and median concentration at site."}
+# Script 06_Boundary_Detection.R
+
+# plotAll <- ggplot(bd)+
+#   geom_point(aes(x = max_Dist, y = median_Parval, color = BoundIntrsct), alpha = .5)+
+#   scale_color_manual(values = c("#1b9e77","#d95f02"))+
+#   scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))+
+#   labs(title = "MCL Exceedance Measured at Testing Boundary",
+#        x = "Distance from Release [m]",
+#        y = "Median Benzene Concentration at Site [ug/L]",
+#        color = "MCL Exceeded")+
+#   xlim(0,600)+
+#   ylim(0,25000)
+# 
+# ## Zoom in
+# bdSub <- bd%>%
+#   filter(median_Parval < 1000 & max_Dist < 200)
+# plotSub <- ggplot(bdSub)+
+#   geom_point(aes(x = max_Dist, y = median_Parval, color = BoundIntrsct),
+#              show.legend = FALSE, alpha = .5)+
+#   scale_color_manual(values = c("#1b9e77","#d95f02"))+
+#   labs(title = "",
+#        x = "",
+#        y = "",
+#        color = "MCL Exceeded")+
+#   scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE))+
+#   theme(panel.border = element_rect(colour = "black", fill=NA, size=2))
+# 
+# plotAll + annotation_custom(ggplotGrob(plotSub), xmin = 200, xmax = 600,
+#                        ymin = 10000, ymax = 28000)
+```
+
+
+## Directionally Normalized Plumes and Study Areas
+We found `r format(nrow(bd),big.mark = ",")` plumes with at least 3 points with benzene concentrations $\ge 5 ug/L$. We calculated mean linear direction of benzene flow and rotated each plume to due north. Each plume was overlaid by shifting the leak origination point to the coordinates (0,0) in the California albers projection.
+
+
+```{r AllplumeAreas, message = FALSE, warning=FALSE,fig.align = "center",fig.height = 4.5,fig.width=5, fig.cap="Visualization of all monitoring areas and plume areas superimposed on top of eachother. Line transparency = 95 percent."}
+areaPlots
+```
+
+
+## Monitoring Well Distances
 
 The distances of all spatially unique monitoring wells were measured from their respective LOPs. Figure 6 shows a histogram as well as the 25th, 50th, 75th and 90th percentiles of maximuim benzene plume distances. The median distance of all monitoring wells from the LOP was `r format(distQuantiles$Distance[2],nsmall = 1)` meters. 90% of monitoring wells were within `r format(distQuantiles$Distance[4],nsmall = 1)` meters of the LOP.
 
@@ -745,10 +718,6 @@ ggplot(uniqueMWPdf)+
   labs(title = "Monitoring Well Distances",
        x = "Distance [m]",y = "Monitoring Wells [count]")
 ```
-
-
-
-
 
 
 # Conclusions & Discussion
