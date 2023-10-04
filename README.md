@@ -1,4 +1,3 @@
-# Geographic Characterization of Benzene Plumes in California
+## Considering Monitoring Well Bias in the Delineation of Benzene Plume Lengths.
 
-## Code and Analysis
-This repository accompanies the paper submitted to AGU GeoHealth. All code needed to reproduce analyses presented in the paper is provided here.
+This repository serves as a companion to research submitted for publication to the Journal of Environmental Engineering. All code used to generate analysis and results presented in the paper is available here. Geotracker data can be obtained from the California Water Boards [geotracker website](https://geotracker.waterboards.ca.gov/data_download_by_county) in order to reproduce our work and results. Much of the data is too large to store in this repository. If you are interested in obtaining derived results, or for additional questions, please contact Andrew Murray at: Murray.AndrewR@epa.gov
